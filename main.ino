@@ -1,6 +1,8 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <ESPAsyncWebServer.h>
+#include <LittleFS.h> 
 
 const int SECOND_TO_MS = 1000;
 const int WEATHER_FETCH_DELAY_MS = 5 * SECOND_TO_MS;
@@ -15,8 +17,16 @@ String apiKey = "03be7812f2704a2be22abdfd25982343";
 String city = "Braniewo";
 String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
 
+struct {
+  float temperature;
+  int humidity;
+  String desc;
+} weather;
+
+AsyncWebServer server(80);
+
 bool try_connect_wifi();
-void check_weather();
+void fetch_weather();
 void weather_task(void* param);
 
 void setup() {
@@ -31,6 +41,19 @@ void setup() {
   }
 
   xTaskCreate(weather_task, "weather_task", 4096, NULL, 1, NULL);
+
+  server.on("/weather", HTTP_GET, [](AsyncWebServerRequest *request){
+    StaticJsonDocument<200> doc;
+    doc["temperature"] = weather.temperature;
+    doc["humidity"] = weather.humidity;
+    doc["desc"] = weather.desc;
+
+    String jsonStr;
+    serializeJson(doc, jsonStr);
+
+    request->send(200, "text/json", jsonStr);
+  });
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
 }
 
 bool try_connect_wifi() {
@@ -50,13 +73,13 @@ bool try_connect_wifi() {
 void weather_task(void* param) {
   while (true) {
     if (WiFi.status() == WL_CONNECTED) {
-      check_weather();
+      fetch_weather();
     }
     vTaskDelay(WEATHER_FETCH_DELAY_MS / portTICK_PERIOD_MS);
   }
 }
 
-void check_weather() {
+void fetch_weather() {
   Serial.print("pobieranie danych");
 
   if (WiFi.status() != WL_CONNECTED) {
@@ -75,11 +98,11 @@ void check_weather() {
     DeserializationError error = deserializeJson(doc, payload);
 
     if (!error) {
-      float temp = doc["main"]["temp"];
+      float temperature = doc["main"]["temp"];
       int humidity = doc["main"]["humidity"];
       const char* desc = doc["weather"][0]["description"];
 
-      Serial.printf("Temperatura: %.1f°C\n", temp);
+      Serial.printf("Temperatura: %.1f°C\n", temperature);
       Serial.printf("Wilgotność: %d%%\n", humidity);
       Serial.printf("Opis: %s\n", desc);
     } else {

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Pogoda</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        h1 { color: #333; }
+        .data { margin-top: 1em; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <h1>Dane pogodowe</h1>
+    <div class="data">
+        <p>Temperatura: <span id="temperature">loading...</span> °C</p>
+        <p>Wilgotność: <span id="humidity">loading...</span> %</p>
+        <p>Opis: <span id="desc">loading...</span></p>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/weather');
+                const json = await response.json();
+                
+                document.getElementById('temperature').innerText = json.temperature;
+                document.getElementById('humidity').innerText = json.humidity;
+                document.getElementById('desc').innerText = json.desc;
+            } catch (err) {
+                console.error("Błąd pobierania danych:", err);
+            }
+        }
+
+        setInterval(fetchData, 1000);
+        fetchData();
+    </script>
+</body>
+</html>

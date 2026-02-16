@@ -30,8 +30,12 @@ void fetch_weather();
 void weather_task(void* param);
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Łączenie z wifi.");
+
+  if(!LittleFS.begin(true)) {
+    Serial.println("LittleFS mount failed");
+  }
 
   if (try_connect_wifi()) {
     Serial.println("\nPołączono z wifi!");
@@ -48,10 +52,22 @@ void setup() {
     doc["humidity"] = weather.humidity;
     doc["desc"] = weather.desc;
 
-    String jsonStr;
-    serializeJson(doc, jsonStr);
+    if (doc.overflowed()) {
+      Serial.println("JSON overflow!");
+      request->send(500, "application/json", "{}");
+      return;
+    }
 
-    request->send(200, "text/json", jsonStr);
+    String jsonStr;
+    size_t written = serializeJson(doc, jsonStr);
+
+    if (written == 0) {
+      Serial.println("Serialization failed");
+      request->send(500, "application/json", "{}");
+      return;
+    }
+
+    request->send(200, "application/json", jsonStr);
   });
   server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
 }
@@ -101,6 +117,10 @@ void fetch_weather() {
       float temperature = doc["main"]["temp"];
       int humidity = doc["main"]["humidity"];
       const char* desc = doc["weather"][0]["description"];
+
+      weather.temperature = temperature;
+      weather.humidity = humidity;
+      weather.desc = String(desc);
 
       Serial.printf("Temperatura: %.1f°C\n", temperature);
       Serial.printf("Wilgotność: %d%%\n", humidity);

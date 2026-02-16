@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include <ESPAsyncWebServer.h>
+#include <WebServer.h>
 #include <LittleFS.h> 
 
 const int SECOND_TO_MS = 1000;
@@ -17,19 +17,16 @@ String apiKey = "03be7812f2704a2be22abdfd25982343";
 String city = "Braniewo";
 String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
 
-SemaphoreHandle_t weather_mutex;
-
 struct {
   float temperature;
   int humidity;
   String desc;
 } weather;
 
-AsyncWebServer server(80);
+WebServer server(80);
 
 bool try_connect_wifi();
 void fetch_weather();
-void weather_task(void* param);
 
 void setup() {
   Serial.begin(9600);
@@ -39,11 +36,6 @@ void setup() {
     Serial.println("Nie udało się zamontować systemu plików LittleFS");
   }
 
-  weather_mutex = xSemaphoreCreateMutex();
-  if (weather_mutex == NULL) {
-    Serial.println("Nie udało się utworzyć mutexa!");
-  }
-
   if (try_connect_wifi()) {
     Serial.println("\nPołączono z wifi!");
   } else {
@@ -51,24 +43,21 @@ void setup() {
     ESP.restart();
   }
 
-  xTaskCreate(weather_task, "weather_task", 4096, NULL, 1, NULL);
-
   server.on("/weather", HTTP_GET, weatherHandler);
   server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+  server.begin();
 }
 
-void weatherHandler(AsyncWebServerRequest *request) {
+void weatherHandler() {
   StaticJsonDocument<200> doc;
 
-  xSemaphoreTake(weather_mutex, portMAX_DELAY);
   doc["temperature"] = weather.temperature;
   doc["humidity"] = weather.humidity;
   doc["desc"] = weather.desc;
-  xSemaphoreGive(weather_mutex);
 
   if (doc.overflowed()) {
     Serial.println("JSON overflow!");
-    request->send(500, "application/json", "{}");
+    server.send(500, "application/json", "{}");
     return;
   }
 
@@ -77,11 +66,11 @@ void weatherHandler(AsyncWebServerRequest *request) {
 
   if (written == 0) {
     Serial.println("Serialization failed");
-    request->send(500, "application/json", "{}");
+    server.send(500, "application/json", "{}");
     return;
   }
 
-  request->send(200, "application/json", jsonStr);
+  server.send(200, "application/json", jsonStr);
 }
 
 bool try_connect_wifi() {
@@ -96,15 +85,6 @@ bool try_connect_wifi() {
   }
 
   return WiFi.status() == WL_CONNECTED;
-}
-
-void weather_task(void* param) {
-  while (true) {
-    if (WiFi.status() == WL_CONNECTED) {
-      fetch_weather();
-    }
-    vTaskDelay(WEATHER_FETCH_DELAY_MS / portTICK_PERIOD_MS);
-  }
 }
 
 void fetch_weather() {
@@ -130,11 +110,9 @@ void fetch_weather() {
       int humidity = doc["main"]["humidity"];
       const char* desc = doc["weather"][0]["description"];
 
-      xSemaphoreTake(weather_mutex, portMAX_DELAY);
       weather.temperature = temperature;
       weather.humidity = humidity;
       weather.desc = String(desc);
-      xSemaphoreGive(weather_mutex);
 
       Serial.printf("Temperatura: %.1f°C\n", temperature);
       Serial.printf("Wilgotność: %d%%\n", humidity);
@@ -151,4 +129,15 @@ void fetch_weather() {
   http.end();
 }
 
-void loop() {}
+unsigned long lastFetch = 0;
+
+void loop() {
+  server.handleClient();
+
+  unsigned long now = millis();
+
+  if (now - lastFetch >= WEATHER_FETCH_DELAY_MS) {
+    fetch_weather();
+    lastFetch = now;
+  }
+}

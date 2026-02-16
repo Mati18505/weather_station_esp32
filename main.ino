@@ -17,6 +17,8 @@ String apiKey = "03be7812f2704a2be22abdfd25982343";
 String city = "Braniewo";
 String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
 
+SemaphoreHandle_t weather_mutex;
+
 struct {
   float temperature;
   int humidity;
@@ -34,7 +36,12 @@ void setup() {
   Serial.println("Łączenie z wifi.");
 
   if(!LittleFS.begin(true)) {
-    Serial.println("LittleFS mount failed");
+    Serial.println("Nie udało się zamontować systemu plików LittleFS");
+  }
+
+  weather_mutex = xSemaphoreCreateMutex();
+  if (weather_mutex == NULL) {
+    Serial.println("Nie udało się utworzyć mutexa!");
   }
 
   if (try_connect_wifi()) {
@@ -46,30 +53,35 @@ void setup() {
 
   xTaskCreate(weather_task, "weather_task", 4096, NULL, 1, NULL);
 
-  server.on("/weather", HTTP_GET, [](AsyncWebServerRequest *request){
-    StaticJsonDocument<200> doc;
-    doc["temperature"] = weather.temperature;
-    doc["humidity"] = weather.humidity;
-    doc["desc"] = weather.desc;
-
-    if (doc.overflowed()) {
-      Serial.println("JSON overflow!");
-      request->send(500, "application/json", "{}");
-      return;
-    }
-
-    String jsonStr;
-    size_t written = serializeJson(doc, jsonStr);
-
-    if (written == 0) {
-      Serial.println("Serialization failed");
-      request->send(500, "application/json", "{}");
-      return;
-    }
-
-    request->send(200, "application/json", jsonStr);
-  });
+  server.on("/weather", HTTP_GET, weatherHandler);
   server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+}
+
+void weatherHandler(AsyncWebServerRequest *request) {
+  StaticJsonDocument<200> doc;
+
+  xSemaphoreTake(weather_mutex, portMAX_DELAY);
+  doc["temperature"] = weather.temperature;
+  doc["humidity"] = weather.humidity;
+  doc["desc"] = weather.desc;
+  xSemaphoreGive(weather_mutex);
+
+  if (doc.overflowed()) {
+    Serial.println("JSON overflow!");
+    request->send(500, "application/json", "{}");
+    return;
+  }
+
+  String jsonStr;
+  size_t written = serializeJson(doc, jsonStr);
+
+  if (written == 0) {
+    Serial.println("Serialization failed");
+    request->send(500, "application/json", "{}");
+    return;
+  }
+
+  request->send(200, "application/json", jsonStr);
 }
 
 bool try_connect_wifi() {
@@ -118,9 +130,11 @@ void fetch_weather() {
       int humidity = doc["main"]["humidity"];
       const char* desc = doc["weather"][0]["description"];
 
+      xSemaphoreTake(weather_mutex, portMAX_DELAY);
       weather.temperature = temperature;
       weather.humidity = humidity;
       weather.desc = String(desc);
+      xSemaphoreGive(weather_mutex);
 
       Serial.printf("Temperatura: %.1f°C\n", temperature);
       Serial.printf("Wilgotność: %d%%\n", humidity);
@@ -131,6 +145,8 @@ void fetch_weather() {
   } else {
     Serial.println("Błąd połączenia http");
   }
+
+  Serial.println();
 
   http.end();
 }

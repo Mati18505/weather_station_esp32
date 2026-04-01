@@ -3,20 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Pogoda</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 2em; }
-        h1 { color: #333; }
-        .data { margin-top: 1em; font-size: 1.2em; }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 <body>
+    <center>
     <h1>Dane pogodowe</h1>
-    <div class="data">
-        <p>Temperatura: <span id="temperature">loading...</span> °C</p>
-        <p>Wilgotność: <span id="humidity">loading...</span> %</p>
-        <p>Opis: <span id="desc">loading...</span></p>
-    </div>
+    </center>
+    <div class="container">
+        <div class="data">
 
+            <table>
+                <tr>
+                    <th>Temperatura</th>
+                    <th>Wilgotność</th>
+                    <th>Opis</th>
+                </tr>
+                <tr>
+                    <td><span id="temperature">loading...</span> °C</td>
+                    <td><span id="humidity">loading...</span> %</td>
+                    <td><span id="desc">loading...</span></td>
+                </tr>
+            </table>
+            
+            
+            
+        </div>
+    </div>
     <script>
         async function fetchData() {
             try {

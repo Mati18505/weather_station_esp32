@@ -12,18 +12,6 @@ struct FirstLineDisplayData {
   int humidity;
 };
 
-String format_first_line(int temp, unsigned int humidity) {
-  char buffer[17];
-
-  int n = snprintf(buffer, sizeof(buffer),
-                   "*C: %d  %%:%d", temp, humidity);
-
-  for (int i = n; i < 16; i++) buffer[i] = ' ';
-  buffer[16] = '\0';
-
-  return String(buffer);
-}
-
 struct ScrollableTextData {
   String scrollable_text;
   int pos = 0;

@@ -1,7 +1,8 @@
+#pragma once
 #include <string>
 
 // 10x' ' + text + 9x' '
-static std::string format_scrollable(std::string_view text) {
+inline std::string format_scrollable(std::string_view text) {
   std::string result;
   result.reserve(10 + text.length() + 9);
 
@@ -10,4 +11,16 @@ static std::string format_scrollable(std::string_view text) {
   for (int i = 0; i < 9; i++) result += ' ';
 
   return result;
+}
+
+inline std::string format_first_line(int temp, unsigned int humidity) {
+  char buffer[17];
+
+  int n = snprintf(buffer, sizeof(buffer),
+                   "*C: %d  %%:%d", temp, humidity);
+
+  for (int i = n; i < 16; i++) buffer[i] = ' ';
+  buffer[16] = '\0';
+
+  return std::string(buffer);
 }

@@ -1,10 +1,10 @@
-#include <cstring>
 #include <unity.h>
 
 #include <display.h>
 #include <string>
+#include <cstring>
 
-void test_text(const char* text) {
+void test_scrollable(const char* text) {
   const size_t text_len = strlen(text);
   const std::string result = format_scrollable(text);
   const size_t start = 10; 
@@ -25,31 +25,29 @@ void test_text(const char* text) {
 }
 
 void test_empty_string() {
-  test_text("");
+  test_scrollable("");
 }
 
 void test_simple_text() {
-  test_text("abc");
+  test_scrollable("abc");
 }
 
 void test_single_char() {
-  test_text("x");
+  test_scrollable("x");
 }
 
 void test_text_with_spaces() {
-  test_text("a b c");
+  test_scrollable("a b c");
 }
 
 void test_long_text() {
-  test_text("HelloWorld123456");
+  test_scrollable("HelloWorld123456");
 }
 
-int main() {
-  UNITY_BEGIN();
+void test_format_scrollable() {
   RUN_TEST(test_empty_string);
   RUN_TEST(test_simple_text);
   RUN_TEST(test_single_char);
   RUN_TEST(test_text_with_spaces);
   RUN_TEST(test_long_text);
-  return UNITY_END();
 }

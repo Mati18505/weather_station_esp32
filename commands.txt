@@ -1,0 +1,5 @@
+pio run -t upload
+pio run --target uploadfs
+pio run -t clean
+pio run -t monitor
+pio run --target buildfs

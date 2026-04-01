@@ -50,13 +50,13 @@ struct ScrollableTextData {
 
 void scroll_system(ScrollableTextData& data) {
   String text = format_scrollable(data.scrollable_text);
-  
+
   lcd.setCursor(0, 1);
   lcd.print(text.substring(data.pos, data.pos + WIDTH));
-  
+
   data.pos++;
   if (data.pos > text.length() - WIDTH) 
-      data.pos = 0;
+    data.pos = 0;
 }
 
 void refresh_display(FirstLineDisplayData data) {
@@ -67,10 +67,9 @@ void refresh_display(FirstLineDisplayData data) {
 
 
 void setup() {
- Wire.begin(20,21);
- lcd.init();
- lcd.backlight();
-
+  Wire.begin(20,21);
+  lcd.init();
+  lcd.backlight();
 
   FirstLineDisplayData data;
   data.temp = 36;

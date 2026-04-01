@@ -4,7 +4,7 @@
 #include <WebServer.h>
 #include <LittleFS.h> 
 #include <secrets.h>
-#include <secrets.h>
+#include <display.h>
 
 const int SECOND_TO_MS = 1000;
 const int WEATHER_FETCH_DELAY_MS = 5 * SECOND_TO_MS;
@@ -23,6 +23,7 @@ WebServer server(80);
 
 bool try_connect_wifi();
 void fetch_weather();
+void weatherHandler();
 
 void setup() {
   Serial.begin(9600);
@@ -40,8 +41,10 @@ void setup() {
   }
 
   server.on("/weather", HTTP_GET, weatherHandler);
-  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+  server.serveStatic("/", LittleFS, "/index.html");
   server.begin();
+
+  setup_lcd();
 }
 
 void weatherHandler() {
@@ -131,7 +134,7 @@ unsigned long lastScroll = 0;
 void loop() {
   server.handleClient();
 
-  static ScrollableTextData scrollable_data = ScrollableTextData::new("light intensity drizzle");
+  static ScrollableTextData scrollable_data = ScrollableTextData::create("light intensity drizzle");
   unsigned long now = millis();
 
   if (now - lastFetch >= WEATHER_FETCH_DELAY_MS) {

@@ -40,7 +40,7 @@ struct ScrollableTextData {
   String scrollable_text;
   int pos = 0;
 
-  static ScrollableTextData new(String text) {
+  static ScrollableTextData create(String text) {
     ScrollableTextData data;
     data.pos = 0;
     data.scrollable_text = text;
@@ -65,7 +65,7 @@ void refresh_display(FirstLineDisplayData data) {
   lcd.print(first_line);
 }
 
-void setup() {
+void setup_lcd() {
   Wire.begin(20,21);
   lcd.init();
   lcd.backlight();

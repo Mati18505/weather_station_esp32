@@ -40,11 +40,11 @@ struct ScrollableTextData {
   String scrollable_text;
   int pos = 0;
 
-  static ScrollableTextData new(String text) {
-    ScrollableTextData data;
-    data.pos = 0;
-    data.scrollable_text = text;
-    return data;
+  static ScrollableTextData new(String text) {
+    ScrollableTextData data;
+    data.pos = 0;
+    data.scrollable_text = text;
+    return data;
   }
 };
 
@@ -82,9 +82,8 @@ void setup() {
 unsigned long lastScroll = 0;
 
 void loop() {
+  static ScrollableTextData scrollable_data = ScrollableTextData::new("light intensity drizzle");
   unsigned long now = millis();
-
-  ScrollableTextData scrollable_data = ScrollableTextData::new("light intensity drizzle");
 
   if (now - lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
     scroll_system(scrollable_data);

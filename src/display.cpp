@@ -1,11 +1,11 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-const int WIDTH = 16;
-const int HEIGHT = 2;
+const int LCD_WIDTH = 16;
+const int LCD_HEIGHT = 2;
 const int SCROLL_DELAY_PER_CHAR_MS = 300;
 
-LiquidCrystal_I2C lcd(0x27, WIDTH, HEIGHT);
+LiquidCrystal_I2C lcd(0x27, LCD_WIDTH, LCD_HEIGHT);
 
 struct FirstLineDisplayData {
   int temp;
@@ -40,11 +40,11 @@ struct ScrollableTextData {
   String scrollable_text;
   int pos = 0;
 
-  static ScrollableTextData new(String text) {
-    ScrollableTextData data;
-    data.pos = 0;
-    data.scrollable_text = text;
-    return data;
+  static ScrollableTextData new(String text) {
+    ScrollableTextData data;
+    data.pos = 0;
+    data.scrollable_text = text;
+    return data;
   }
 };
 
@@ -52,10 +52,10 @@ void scroll_system(ScrollableTextData& data) {
   String text = format_scrollable(data.scrollable_text);
 
   lcd.setCursor(0, 1);
-  lcd.print(text.substring(data.pos, data.pos + WIDTH));
+  lcd.print(text.substring(data.pos, data.pos + LCD_WIDTH));
 
   data.pos++;
-  if (data.pos > text.length() - WIDTH) 
+  if (data.pos > text.length() - LCD_WIDTH) 
     data.pos = 0;
 }
 
@@ -64,7 +64,6 @@ void refresh_display(FirstLineDisplayData data) {
   lcd.setCursor(0, 0);
   lcd.print(first_line);
 }
-
 
 void setup() {
   Wire.begin(20,21);

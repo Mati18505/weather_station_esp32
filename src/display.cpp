@@ -24,6 +24,18 @@ String format_first_line(int temp, unsigned int humidity) {
   return String(buffer);
 }
 
+// 10x' ' + text + 9x' '
+String format_scrollable(const String& text) {
+  String result;
+  result.reserve(10 + text.length() + 9);
+
+  for (int i = 0; i < 10; i++) result += ' ';
+  result += text;
+  for (int i = 0; i < 9; i++) result += ' ';
+
+  return result;
+}
+
 struct ScrollableTextData {
   String scrollable_text;
   int pos = 0;
@@ -37,7 +49,7 @@ struct ScrollableTextData {
 };
 
 void scroll_system(ScrollableTextData& data) {
-  String text = "          " + data.scrollable_text + "         ";
+  String text = format_scrollable(data.scrollable_text);
   
   lcd.setCursor(0, 1);
   lcd.print(text.substring(data.pos, data.pos + WIDTH));

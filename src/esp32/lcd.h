@@ -25,10 +25,10 @@ struct ScrollableTextData {
 };
 
 void scroll_system(ScrollableTextData& data) {
-  String text = format_scrollable(data.scrollable_text);
+  std::string text = format_scrollable(data.scrollable_text.c_str());
 
   lcd.setCursor(0, 1);
-  lcd.print(text.substring(data.pos, data.pos + LCD_WIDTH));
+  lcd.print(text.substr(data.pos, LCD_WIDTH).c_str());
 
   data.pos++;
   if (data.pos > text.length() - LCD_WIDTH) 
@@ -36,9 +36,9 @@ void scroll_system(ScrollableTextData& data) {
 }
 
 void refresh_display(FirstLineDisplayData data) {
-  String first_line = format_first_line(data.temp, data.humidity);
+  std::string first_line = format_first_line(data.temp, data.humidity);
   lcd.setCursor(0, 0);
-  lcd.print(first_line);
+  lcd.print(first_line.c_str());
 }
 
 void setup_lcd() {

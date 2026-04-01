@@ -69,22 +69,4 @@ void setup() {
   Wire.begin(20,21);
   lcd.init();
   lcd.backlight();
-
-  FirstLineDisplayData data;
-  data.temp = 36;
-  data.humidity = 67;
-
-  refresh_display(data);
-}
-
-unsigned long lastScroll = 0;
-
-void loop() {
-  static ScrollableTextData scrollable_data = ScrollableTextData::new("light intensity drizzle");
-  unsigned long now = millis();
-
-  if (now - lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
-    scroll_system(scrollable_data);
-    lastScroll = now;
-  }
 }

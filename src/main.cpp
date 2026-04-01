@@ -4,6 +4,7 @@
 #include <WebServer.h>
 #include <LittleFS.h> 
 #include <secrets.h>
+#include <secrets.h>
 
 const int SECOND_TO_MS = 1000;
 const int WEATHER_FETCH_DELAY_MS = 5 * SECOND_TO_MS;
@@ -125,14 +126,29 @@ void fetch_weather() {
 }
 
 unsigned long lastFetch = 0;
+unsigned long lastScroll = 0;
 
 void loop() {
   server.handleClient();
 
+  static ScrollableTextData scrollable_data = ScrollableTextData::new("light intensity drizzle");
   unsigned long now = millis();
 
   if (now - lastFetch >= WEATHER_FETCH_DELAY_MS) {
-    fetch_weather();
     lastFetch = now;
+
+    fetch_weather();
+
+    FirstLineDisplayData data;
+    data.temp = 36;
+    data.humidity = 67;
+
+    refresh_display(data);
+  }
+
+  if (now - lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
+    lastScroll = now;
+
+    scroll_system(scrollable_data);
   }
 }

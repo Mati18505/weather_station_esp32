@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <display.h>
 
 const int LCD_WIDTH = 16;
 const int LCD_HEIGHT = 2;
@@ -21,18 +22,6 @@ String format_first_line(int temp, unsigned int humidity) {
   buffer[16] = '\0';
 
   return String(buffer);
-}
-
-// 10x' ' + text + 9x' '
-String format_scrollable(const String& text) {
-  String result;
-  result.reserve(10 + text.length() + 9);
-
-  for (int i = 0; i < 10; i++) result += ' ';
-  result += text;
-  for (int i = 0; i < 9; i++) result += ' ';
-
-  return result;
 }
 
 struct ScrollableTextData {

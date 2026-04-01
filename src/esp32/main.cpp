@@ -1,5 +1,5 @@
 #include <cmath>
-#include "display.h"
+#include "lcd.h"
 #include "network.h"
 #include <optional>
 

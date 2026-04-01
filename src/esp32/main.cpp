@@ -1,6 +1,6 @@
 #include <cmath>
-#include <display.h>
-#include <network.h>
+#include "display.h"
+#include "network.h"
 #include <optional>
 
 static const int SECOND_TO_MS = 1000;

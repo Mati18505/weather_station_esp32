@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 #include <WebServer.h>
 #include <LittleFS.h> 
-#include <secrets.h>
+#include <common/secrets.h>
 #include <optional>
 
 const int MAX_WIFI_CONNECT_ATTEMPTS = 10;

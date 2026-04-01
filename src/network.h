@@ -6,8 +6,6 @@
 #include <secrets.h>
 #include <optional>
 
-const int SECOND_TO_MS = 1000;
-const int WEATHER_FETCH_DELAY_MS = 5 * SECOND_TO_MS;
 const int MAX_WIFI_CONNECT_ATTEMPTS = 10;
 
 String city = "Braniewo";

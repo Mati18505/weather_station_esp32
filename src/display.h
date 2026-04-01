@@ -3,7 +3,6 @@
 
 const int LCD_WIDTH = 16;
 const int LCD_HEIGHT = 2;
-const int SCROLL_DELAY_PER_CHAR_MS = 300;
 
 LiquidCrystal_I2C lcd(0x27, LCD_WIDTH, LCD_HEIGHT);
 

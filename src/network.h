@@ -24,7 +24,7 @@ std::optional<Weather> fetch_weather();
 void weatherHandler(Weather& weather);
 
 void weatherHandler(Weather& weather) {
-  StaticJsonDocument<200> doc;
+  JsonDocument doc;
 
   doc["temperature"] = weather.temperature;
   doc["humidity"] = weather.humidity;
@@ -79,7 +79,7 @@ std::optional<Weather> fetch_weather() {
   if (httpCode > 0) {
     String payload = http.getString();
 
-    StaticJsonDocument<1024> doc;
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, payload);
 
     if (!error) {

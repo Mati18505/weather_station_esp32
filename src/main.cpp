@@ -1,8 +1,15 @@
+#include <cmath>
 #include <display.h>
 #include <network.h>
 #include <optional>
 
-static Weather weather;
+struct AppState {
+  Weather weather;
+  ScrollableTextData lcd_second_row;
+  long lastFetch = 0;
+  long lastScroll = 0;
+};
+static AppState app;
 
 void setup() {
   Serial.begin(9600);
@@ -11,39 +18,37 @@ void setup() {
     Serial.println("Nie udało się zamontować systemu plików LittleFS");
   }
 
-  setup_network(weather);
+  setup_network(app.weather);
   setup_lcd();
 }
-
-unsigned long lastFetch = 0;
-unsigned long lastScroll = 0;
 
 void loop() {
   server.handleClient();
 
   unsigned long now = millis();
 
-  if (now - lastFetch >= WEATHER_FETCH_DELAY_MS) {
-    lastFetch = now;
+  if (now - app.lastFetch >= WEATHER_FETCH_DELAY_MS) {
+    app.lastFetch = now;
 
     std::optional<Weather> maybe_weather = fetch_weather();
-    if (maybe_weather) {
-      weather = *maybe_weather;
+    if (maybe_weather.has_value()) {
+      if (maybe_weather->desc != app.weather.desc) {
+        app.lcd_second_row = ScrollableTextData::create(maybe_weather->desc);
+      }
+      app.weather = *maybe_weather;
     }
 
     FirstLineDisplayData data {
-      .temp = weather.temperature,
-      .humidity = weather.humidity,
+      .temp = std::round(app.weather.temperature),
+      .humidity = app.weather.humidity,
     };
 
     refresh_display(data);
   }
 
-  static ScrollableTextData scrollable_data = ScrollableTextData::create(weather.desc);
+  if (now - app.lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
+    app.lastScroll = now;
 
-  if (now - lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
-    lastScroll = now;
-
-    scroll_system(scrollable_data);
+    scroll_system(app.lcd_second_row);
   }
 }

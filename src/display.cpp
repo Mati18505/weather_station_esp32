@@ -14,7 +14,12 @@ struct FirstLineDisplayData {
 
 String format_first_line(int temp, unsigned int humidity) {
   char buffer[17];
-    sprintf(buffer, "*C: %d  %%:%d", temp, humidity);
+
+  int n = snprintf(buffer, sizeof(buffer),
+                   "*C: %d  %%:%d", temp, humidity);
+
+  for (int i = n; i < 16; i++) buffer[i] = ' ';
+  buffer[16] = '\0';
 
   return String(buffer);
 }
@@ -44,6 +49,7 @@ void scroll_system(ScrollableTextData& data) {
 
 void refresh_display(FirstLineDisplayData data) {
   String first_line = format_first_line(data.temp, data.humidity);
+  lcd.setCursor(0, 0);
   lcd.print(first_line);
 }
 

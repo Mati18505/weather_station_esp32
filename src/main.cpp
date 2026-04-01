@@ -1,8 +1,3 @@
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include <ArduinoJson.h>
-#include <WebServer.h>
-#include <LittleFS.h> 
 #include <display.h>
 #include <network.h>
 #include <optional>

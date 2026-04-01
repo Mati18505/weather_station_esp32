@@ -41,10 +41,10 @@ struct ScrollableTextData {
   int pos = 0;
 
   static ScrollableTextData create(String text) {
-    ScrollableTextData data;
-    data.pos = 0;
-    data.scrollable_text = text;
-    return data;
+    return ScrollableTextData {
+      .scrollable_text = text,
+      .pos = 0,
+    };
   }
 };
 

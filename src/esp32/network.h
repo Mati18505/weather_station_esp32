@@ -88,34 +88,41 @@ std::optional<Weather> parse_weather_json(std::string_view payload) {
   };
 }
 
+int http_get(const String& url, std::string& outPayload) {
+  HTTPClient http;
+  http.begin(url);
+  int code = http.GET();
+
+  if (code > 0) {
+    outPayload = std::string(http.getString().c_str());
+  }
+
+  http.end();
+  return code;
+}
+
 std::optional<Weather> fetch_weather() {
   std::optional<Weather> result = std::nullopt;
 
   Serial.print("pobieranie danych");
 
   if (!is_wifi_connected()) {
-    Serial.print("brak połączenia wifi");
+    Serial.println("brak połączenia wifi");
     return result;
   }
 
-  HTTPClient http;
-  http.begin(url);
-  int httpCode = http.GET();
+  std::string payload {};
 
-  if (httpCode > 0) {
-    String payload = http.getString();
-    result = parse_weather_json(payload.c_str());
-
-    if (!result.has_value()) {
-      Serial.println("Błąd JSON");
-    }
-  } else {
+  if (!http_get(url, payload)) {
     Serial.println("Błąd połączenia http");
+    return result;
   }
 
-  Serial.println();
+  result = parse_weather_json(payload);
 
-  http.end();
+  if (!result.has_value()) {
+    Serial.println("Błąd JSON");
+  }
 
   return result;
 }

@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <cstddef>
 #include <display.h>
 
 const int LCD_WIDTH = 16;
@@ -14,7 +15,7 @@ struct FirstLineDisplayData {
 
 struct ScrollableTextData {
   String scrollable_text;
-  int pos = 0;
+  size_t pos = 0;
 
   static ScrollableTextData create(String text) {
     return ScrollableTextData {
@@ -30,9 +31,7 @@ void scroll_system(ScrollableTextData& data) {
   lcd.setCursor(0, 1);
   lcd.print(text.substr(data.pos, LCD_WIDTH).c_str());
 
-  data.pos++;
-  if (data.pos > text.length() - LCD_WIDTH) 
-    data.pos = 0;
+  data.pos = wrap_increment(data.pos, text.length() - LCD_WIDTH);
 }
 
 void refresh_display(FirstLineDisplayData data) {

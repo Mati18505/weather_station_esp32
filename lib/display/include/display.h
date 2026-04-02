@@ -24,3 +24,12 @@ inline std::string format_first_line(int temp, unsigned int humidity) {
 
   return std::string(buffer);
 }
+
+inline size_t wrap_increment(size_t x, size_t wrap_at) {
+  x++;
+
+  if (x > wrap_at) 
+    x = 0;
+
+  return x;
+}

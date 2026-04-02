@@ -18,7 +18,9 @@ bool try_connect_wifi();
 std::optional<Weather> fetch_weather();
 void weatherHandler(Weather& weather);
 
-void weatherHandler(Weather& weather) {
+// Returns serialized weather in json.
+// If error occured, returns empty string.
+std::string serialize_weather(const Weather& weather) {
   JsonDocument doc;
 
   doc["temperature"] = weather.temperature;
@@ -26,21 +28,17 @@ void weatherHandler(Weather& weather) {
   doc["desc"] = weather.desc;
 
   if (doc.overflowed()) {
-    Serial.println("JSON overflow!");
-    server.send(500, "application/json", "{}");
-    return;
+    return {};
   }
 
-  String jsonStr;
+  std::string jsonStr;
   size_t written = serializeJson(doc, jsonStr);
 
   if (written == 0) {
-    Serial.println("Serialization failed");
-    server.send(500, "application/json", "{}");
-    return;
+    return {};
   }
 
-  server.send(200, "application/json", jsonStr);
+  return jsonStr;
 }
 
 bool is_wifi_connected() {
@@ -104,7 +102,7 @@ std::optional<Weather> fetch_weather() {
   return result;
 }
 
-void setup_network(Weather& weather) {
+void setup_network(const Weather& weather) {
   Serial.println("Łączenie z wifi.");
 
   if (try_connect_wifi()) {
@@ -115,7 +113,13 @@ void setup_network(Weather& weather) {
   }
 
   server.on("/weather", HTTP_GET, [&weather]() {
-    weatherHandler(weather);
+    std::string response = serialize_weather(weather);
+
+    if (response.empty()) {
+      server.send(500, "application/json", "{}");
+    } else {
+      server.send(200, "application/json", response.c_str());
+    }
   });
   server.serveStatic("/", LittleFS, "/index.html");
   server.begin();

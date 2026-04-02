@@ -18,29 +18,6 @@ bool try_connect_wifi();
 std::optional<Weather> fetch_weather();
 void weatherHandler(Weather& weather);
 
-// Returns serialized weather in json.
-// If error occured, returns empty string.
-std::string serialize_weather(const Weather& weather) {
-  JsonDocument doc;
-
-  doc["temperature"] = weather.temperature;
-  doc["humidity"] = weather.humidity;
-  doc["desc"] = weather.desc;
-
-  if (doc.overflowed()) {
-    return {};
-  }
-
-  std::string jsonStr;
-  size_t written = serializeJson(doc, jsonStr);
-
-  if (written == 0) {
-    return {};
-  }
-
-  return jsonStr;
-}
-
 bool is_wifi_connected() {
   return WiFi.status() == WL_CONNECTED;
 }

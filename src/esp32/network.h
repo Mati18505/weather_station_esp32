@@ -2,15 +2,11 @@
 #include <HTTPClient.h>
 #include <WebServer.h>
 #include <LittleFS.h> 
-#include <common/secrets.h>
 #include <optional>
+#include <string>
 
+#include <common/config.h>
 #include <weather.h>
-
-const int MAX_WIFI_CONNECT_ATTEMPTS = 10;
-
-String city = "Braniewo";
-String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
 
 static WebServer server(80);
 
@@ -18,12 +14,25 @@ bool try_connect_wifi();
 std::optional<Weather> fetch_weather();
 void weatherHandler(Weather& weather);
 
+std::string buildWeatherUrl() {
+  std::string url;
+  url.reserve(128);
+
+  url += BASE_URL;
+  url += CITY;
+  url += "&appid=";
+  url += API_KEY;
+  url += "&units=metric";
+
+  return url;
+}
+
 bool is_wifi_connected() {
   return WiFi.status() == WL_CONNECTED;
 }
 
 bool try_connect_wifi() {
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
+  WiFi.begin(WIFI_SSID.data(), WIFI_PASS.data());
 
   retry_until_success([](){
     if (is_wifi_connected()) {
@@ -39,9 +48,9 @@ bool try_connect_wifi() {
   return is_wifi_connected();
 }
 
-int http_get(const String& url, std::string& outPayload) {
+int http_get(const std::string& url, std::string& outPayload) {
   HTTPClient http;
-  http.begin(url);
+  http.begin(url.c_str());
   int code = http.GET();
 
   if (code > 0) {
@@ -57,7 +66,7 @@ std::optional<Weather> fetch_weather() {
     Serial.println("brak połączenia wifi");
     return std::nullopt;
   }
-
+  const std::string url = buildWeatherUrl();
   std::string payload {};
 
   int code = http_get(url, payload);

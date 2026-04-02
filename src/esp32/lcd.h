@@ -1,10 +1,9 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <cstddef>
-#include <display.h>
 
-const int LCD_WIDTH = 16;
-const int LCD_HEIGHT = 2;
+#include <common/config.h>
+#include <display.h>
 
 LiquidCrystal_I2C lcd(0x27, LCD_WIDTH, LCD_HEIGHT);
 

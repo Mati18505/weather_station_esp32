@@ -1,11 +1,8 @@
 #include <cmath>
+
+#include <common/config.h>
 #include "lcd.h"
 #include "network.h"
-#include <optional>
-
-static const int SECOND_TO_MS = 1000;
-static const int WEATHER_FETCH_DELAY_MS = 5 * SECOND_TO_MS;
-static const int SCROLL_DELAY_PER_CHAR_MS = 300;
 
 struct AppState {
   Weather weather;

@@ -34,6 +34,8 @@ void loop() {
   if (now - app.lastFetch >= WEATHER_FETCH_DELAY_MS) {
     app.lastFetch = now;
 
+    Serial.println("pobieranie danych");
+
     std::optional<Weather> maybe_weather = fetch_weather();
     if (maybe_weather.has_value()) {
       if (maybe_weather->desc != app.weather.desc) {

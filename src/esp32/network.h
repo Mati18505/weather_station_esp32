@@ -102,23 +102,19 @@ int http_get(const String& url, std::string& outPayload) {
 }
 
 std::optional<Weather> fetch_weather() {
-  std::optional<Weather> result = std::nullopt;
-
-  Serial.print("pobieranie danych");
-
   if (!is_wifi_connected()) {
     Serial.println("brak połączenia wifi");
-    return result;
+    return std::nullopt;
   }
 
   std::string payload {};
 
   if (!http_get(url, payload)) {
     Serial.println("Błąd połączenia http");
-    return result;
+    return std::nullopt;
   }
 
-  result = parse_weather_json(payload);
+  std::optional<Weather> result = parse_weather_json(payload);
 
   if (!result.has_value()) {
     Serial.println("Błąd JSON");

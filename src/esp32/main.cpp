@@ -1,6 +1,6 @@
 #include <cmath>
-#include <display.h>
-#include <network.h>
+#include "lcd.h"
+#include "network.h"
 #include <optional>
 
 static const int SECOND_TO_MS = 1000;
@@ -26,6 +26,14 @@ void setup() {
   setup_lcd();
 }
 
+void update_app_state(AppState& app, const Weather& new_weather) {
+    if (new_weather.desc != app.weather.desc) {
+        String desc = String(new_weather.desc.c_str());
+        app.lcd_second_row = ScrollableTextData::create(desc);
+    }
+    app.weather = new_weather;
+}
+
 void loop() {
   server.handleClient();
 
@@ -34,12 +42,11 @@ void loop() {
   if (now - app.lastFetch >= WEATHER_FETCH_DELAY_MS) {
     app.lastFetch = now;
 
+    Serial.println("pobieranie danych");
+
     std::optional<Weather> maybe_weather = fetch_weather();
     if (maybe_weather.has_value()) {
-      if (maybe_weather->desc != app.weather.desc) {
-        app.lcd_second_row = ScrollableTextData::create(maybe_weather->desc);
-      }
-      app.weather = *maybe_weather;
+      update_app_state(app, maybe_weather.value());
     }
 
     FirstLineDisplayData data {

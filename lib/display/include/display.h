@@ -24,7 +24,9 @@ inline std::string format_first_line(int temp, unsigned int humidity) {
   int n = snprintf(buffer, sizeof(buffer),
                    "*C: %d  %%:%d", temp, humidity);
 
-  for (int i = n; i < 16; i++) buffer[i] = ' ';
+  int text_end = std::clamp(n, 0, 16);
+
+  for (int i = text_end; i < 16; i++) buffer[i] = ' ';
   buffer[16] = '\0';
 
   return std::string(buffer);

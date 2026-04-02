@@ -5,7 +5,7 @@
 #include <common/secrets.h>
 #include <optional>
 
-#include <network.h>
+#include <weather.h>
 
 const int MAX_WIFI_CONNECT_ATTEMPTS = 10;
 

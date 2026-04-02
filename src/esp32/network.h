@@ -75,7 +75,7 @@ std::optional<Weather> fetch_weather() {
   return result;
 }
 
-void setup_network(const Weather& weather) {
+void setup_network(std::shared_ptr<Weather> weather) {
   Serial.println("Łączenie z wifi.");
 
   if (try_connect_wifi()) {
@@ -85,8 +85,8 @@ void setup_network(const Weather& weather) {
     ESP.restart();
   }
 
-  server.on("/weather", HTTP_GET, [&weather]() {
-    std::string response = serialize_weather(weather);
+  server.on("/weather", HTTP_GET, [weather]() {
+    std::string response = serialize_weather(*weather);
 
     if (response.empty()) {
       server.send(500, "application/json", "{}");

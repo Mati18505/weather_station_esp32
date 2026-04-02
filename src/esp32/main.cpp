@@ -5,7 +5,7 @@
 #include "network.h"
 
 struct AppState {
-  Weather weather;
+  std::shared_ptr<Weather> weather = std::make_shared<Weather>();
   ScrollableTextData lcd_second_row;
   long lastFetch = 0;
   long lastScroll = 0;
@@ -24,11 +24,11 @@ void setup() {
 }
 
 void update_app_state(AppState& app, const Weather& new_weather) {
-    if (new_weather.desc != app.weather.desc) {
+    if (new_weather.desc != app.weather->desc) {
         String desc = String(new_weather.desc.c_str());
         app.lcd_second_row = ScrollableTextData::create(desc);
     }
-    app.weather = new_weather;
+    *(app.weather) = new_weather;
 }
 
 void loop() {
@@ -47,8 +47,8 @@ void loop() {
     }
 
     FirstLineDisplayData data {
-      .temp = std::round(app.weather.temperature),
-      .humidity = app.weather.humidity,
+      .temp = std::round(app.weather->temperature),
+      .humidity = app.weather->humidity,
     };
 
     refresh_display(data);

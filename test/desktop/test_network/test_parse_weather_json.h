@@ -40,6 +40,20 @@ void test_parse_weather_missing_fields() {
   TEST_ASSERT_FALSE(result.has_value());
 }
 
+void test_parse_weather_empty_desc() {
+  std::string json = R"({
+    "main": { "temp": 21.5, "humidity": 60 },
+    "weather": [ { "description": "" } ]
+    })";
+
+  auto result = parse_weather_json(json);
+
+  TEST_ASSERT_TRUE(result.has_value());
+  TEST_ASSERT_EQUAL_FLOAT(21.5, result->temperature);
+  TEST_ASSERT_EQUAL_INT(60, result->humidity);
+  TEST_ASSERT_EQUAL_STRING("", result->desc.c_str());
+}
+
 void test_parse_weather_real_valid_json() {
   // Example response from openweather.
   std::string json = R"(

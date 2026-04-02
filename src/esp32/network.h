@@ -64,6 +64,8 @@ bool try_connect_wifi() {
 
     delay(500);
     Serial.print(".");
+
+    return false;
   }, MAX_WIFI_CONNECT_ATTEMPTS);
 
   return is_wifi_connected();

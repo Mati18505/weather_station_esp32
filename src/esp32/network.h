@@ -69,6 +69,23 @@ bool try_connect_wifi() {
   return is_wifi_connected();
 }
 
+std::optional<Weather> parse_weather_json(std::string_view payload) {
+  JsonDocument doc;
+  if (deserializeJson(doc, payload)) {
+      return std::nullopt;
+  }
+
+  float temperature = doc["main"]["temp"];
+  int humidity = doc["main"]["humidity"];
+  const char* desc = doc["weather"][0]["description"];
+
+  return Weather{
+    .temperature = temperature,
+    .humidity = humidity,
+    .desc = desc,
+  };
+}
+
 std::optional<Weather> fetch_weather() {
   std::optional<Weather> result = std::nullopt;
 
@@ -85,27 +102,9 @@ std::optional<Weather> fetch_weather() {
 
   if (httpCode > 0) {
     String payload = http.getString();
+    result = parse_weather_json(payload.c_str());
 
-    JsonDocument doc;
-    DeserializationError error = deserializeJson(doc, payload);
-
-    if (!error) {
-      float temperature = doc["main"]["temp"];
-      int humidity = doc["main"]["humidity"];
-      const char* desc = doc["weather"][0]["description"];
-      
-      Weather weather;
-
-      weather.temperature = temperature;
-      weather.humidity = humidity;
-      weather.desc = String(desc);
-
-      result = weather;
-
-      Serial.printf("Temperatura: %.1f°C\n", temperature);
-      Serial.printf("Wilgotność: %d%%\n", humidity);
-      Serial.printf("Opis: %s\n", desc);
-    } else {
+    if (!result.has_value()) {
       Serial.println("Błąd JSON");
     }
   } else {

@@ -85,8 +85,13 @@ std::optional<Weather> fetch_weather() {
 
   std::string payload {};
 
-  if (!http_get(url, payload)) {
+  int code = http_get(url, payload);
+  if (code <= 0) {
     Serial.println("Błąd połączenia http");
+    return std::nullopt;
+  }
+  if (code != 200) {
+    Serial.printf("Błąd http: %d\n", code);
     return std::nullopt;
   }
 

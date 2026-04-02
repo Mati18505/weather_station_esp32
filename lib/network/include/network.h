@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <cstdint>
 #include <functional>
 #include <optional>
@@ -31,9 +32,23 @@ std::optional<Weather> parse_weather_json(std::string_view payload) {
       return std::nullopt;
   }
 
-  float temperature = doc["main"]["temp"];
-  int humidity = doc["main"]["humidity"];
-  const char* desc = doc["weather"][0]["description"];
+  JsonObject main = doc["main"].as<JsonObject>();
+  if (!main) {
+    return std::nullopt;
+  }
+
+  JsonArray weather = doc["weather"].as<JsonArray>();
+  if (!weather || weather.size() == 0) {
+    return std::nullopt;
+  }
+
+  float temperature = main["temp"] | NAN;
+  int humidity = main["humidity"] | -1;
+  std::string desc = weather[0]["description"] | "";
+
+  if (std::isnan(temperature) || humidity < 0) {
+      return std::nullopt;
+  }
 
   return Weather{
     .temperature = temperature,

@@ -50,11 +50,15 @@ void weatherHandler(Weather& weather) {
   server.send(200, "application/json", jsonStr);
 }
 
+bool is_wifi_connected() {
+  return WiFi.status() == WL_CONNECTED;
+}
+
 bool try_connect_wifi() {
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
   retry_until_success([](){
-    if (WiFi.status() == WL_CONNECTED) {
+    if (is_wifi_connected()) {
       return true;
     }
 
@@ -62,7 +66,7 @@ bool try_connect_wifi() {
     Serial.print(".");
   }, MAX_WIFI_CONNECT_ATTEMPTS);
 
-  return WiFi.status() == WL_CONNECTED;
+  return is_wifi_connected();
 }
 
 std::optional<Weather> fetch_weather() {
@@ -70,7 +74,7 @@ std::optional<Weather> fetch_weather() {
 
   Serial.print("pobieranie danych");
 
-  if (WiFi.status() != WL_CONNECTED) {
+  if (!is_wifi_connected()) {
     Serial.print("brak połączenia wifi");
     return result;
   }

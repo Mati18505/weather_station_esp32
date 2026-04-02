@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
 #include <WebServer.h>
 #include <LittleFS.h> 
 #include <common/secrets.h>
@@ -12,12 +11,6 @@ const int MAX_WIFI_CONNECT_ATTEMPTS = 10;
 
 String city = "Braniewo";
 String url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
-
-struct Weather {
-  float temperature;
-  int humidity;
-  String desc;
-};
 
 static WebServer server(80);
 
@@ -69,23 +62,6 @@ bool try_connect_wifi() {
   }, MAX_WIFI_CONNECT_ATTEMPTS);
 
   return is_wifi_connected();
-}
-
-std::optional<Weather> parse_weather_json(std::string_view payload) {
-  JsonDocument doc;
-  if (deserializeJson(doc, payload)) {
-      return std::nullopt;
-  }
-
-  float temperature = doc["main"]["temp"];
-  int humidity = doc["main"]["humidity"];
-  const char* desc = doc["weather"][0]["description"];
-
-  return Weather{
-    .temperature = temperature,
-    .humidity = humidity,
-    .desc = desc,
-  };
 }
 
 int http_get(const String& url, std::string& outPayload) {

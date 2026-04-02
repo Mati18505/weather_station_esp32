@@ -39,7 +39,8 @@ void loop() {
     std::optional<Weather> maybe_weather = fetch_weather();
     if (maybe_weather.has_value()) {
       if (maybe_weather->desc != app.weather.desc) {
-        app.lcd_second_row = ScrollableTextData::create(maybe_weather->desc);
+        String desc = String(maybe_weather->desc.c_str());
+        app.lcd_second_row = ScrollableTextData::create(desc);
       }
       app.weather = *maybe_weather;
     }

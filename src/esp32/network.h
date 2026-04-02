@@ -6,6 +6,8 @@
 #include <common/secrets.h>
 #include <optional>
 
+#include <network.h>
+
 const int MAX_WIFI_CONNECT_ATTEMPTS = 10;
 
 String city = "Braniewo";
@@ -50,14 +52,15 @@ void weatherHandler(Weather& weather) {
 
 bool try_connect_wifi() {
   WiFi.begin(WIFI_SSID, WIFI_PASS);
-  int attempt = 0;
 
-  while (WiFi.status() != WL_CONNECTED && attempt < MAX_WIFI_CONNECT_ATTEMPTS) {
+  retry_until_success([](){
+    if (WiFi.status() == WL_CONNECTED) {
+      return true;
+    }
+
     delay(500);
     Serial.print(".");
-
-    attempt++;
-  }
+  }, MAX_WIFI_CONNECT_ATTEMPTS);
 
   return WiFi.status() == WL_CONNECTED;
 }

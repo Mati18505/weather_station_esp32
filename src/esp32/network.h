@@ -14,19 +14,6 @@ bool try_connect_wifi();
 std::optional<Weather> fetch_weather();
 void weatherHandler(Weather& weather);
 
-std::string buildWeatherUrl() {
-  std::string url;
-  url.reserve(128);
-
-  url += BASE_URL;
-  url += CITY;
-  url += "&appid=";
-  url += API_KEY;
-  url += "&units=metric";
-
-  return url;
-}
-
 bool is_wifi_connected() {
   return WiFi.status() == WL_CONNECTED;
 }
@@ -66,7 +53,7 @@ std::optional<Weather> fetch_weather() {
     Serial.println("brak połączenia wifi");
     return std::nullopt;
   }
-  const std::string url = buildWeatherUrl();
+  const std::string url = build_weather_url(BASE_URL, CITY, API_KEY);
   std::string payload {};
 
   int code = http_get(url, payload);

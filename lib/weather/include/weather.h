@@ -79,3 +79,16 @@ std::string serialize_weather(const Weather& weather) {
 
   return jsonStr;
 }
+
+std::string build_weather_url(std::string_view base_url, std::string_view city, std::string_view api_key) {
+  std::string url;
+  url.reserve(128);
+
+  url += base_url;
+  url += city;
+  url += "&appid=";
+  url += api_key;
+  url += "&units=metric";
+
+  return url;
+}

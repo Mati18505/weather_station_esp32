@@ -1,7 +1,10 @@
 #include <cmath>
+#include <string_view>
 
 #include <common/config.h>
 #include "lcd.h"
+#include "common/network.h"
+#include "common/format.h"
 #include "network.h"
 
 struct AppState {
@@ -24,10 +27,10 @@ void setup() {
 }
 
 void update_app_state(AppState& app, const Weather& new_weather) {
-    if (new_weather.desc != app.weather->desc) {
-        app.lcd_second_row = ScrollableTextData::create(new_weather.desc);
-    }
-    *(app.weather) = new_weather;
+  if (new_weather.desc != app.weather->desc) {
+    app.lcd_second_row = ScrollableTextData::create(new_weather.desc);
+  }
+  *(app.weather) = new_weather;
 }
 
 void loop() {
@@ -38,19 +41,27 @@ void loop() {
   if (now - app.lastFetch >= WEATHER_FETCH_DELAY_MS) {
     app.lastFetch = now;
 
-    Serial.println("pobieranie danych");
+    if (is_wifi_connected()) {
+      Serial.println("pobieranie danych");
+      FetchResult result = fetch_weather(http_get);
 
-    std::optional<Weather> maybe_weather = fetch_weather();
-    if (maybe_weather.has_value()) {
-      update_app_state(app, maybe_weather.value());
+      if (result.weather.has_value()) {
+        update_app_state(app, result.weather.value());
+
+        FirstLineDisplayData data {
+          .temp = std::round(app.weather->temperature),
+          .humidity = app.weather->humidity,
+        };
+
+        refresh_display(data, lcd_print);
+      } else if (result.error.has_value()) {
+          Serial.println(fetch_error_to_string(result.error.value()).c_str());
+        }
+      }
+
+    } else {
+      Serial.println("brak połączenia wifi");
     }
-
-    FirstLineDisplayData data {
-      .temp = std::round(app.weather->temperature),
-      .humidity = app.weather->humidity,
-    };
-
-    refresh_display(data, lcd_print);
   }
 
   if (now - app.lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {

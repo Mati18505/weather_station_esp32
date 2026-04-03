@@ -11,7 +11,6 @@
 static WebServer server(80);
 
 bool try_connect_wifi();
-std::optional<Weather> fetch_weather();
 void weatherHandler(Weather& weather);
 
 bool is_wifi_connected() {
@@ -35,9 +34,11 @@ bool try_connect_wifi() {
   return is_wifi_connected();
 }
 
-int http_get(const std::string& url, std::string& outPayload) {
+int http_get(std::string_view url, std::string& outPayload) {
+  const std::string url_nt(url);
+
   HTTPClient http;
-  http.begin(url.c_str());
+  http.begin(url_nt.c_str());
   int code = http.GET();
 
   if (code > 0) {
@@ -46,33 +47,6 @@ int http_get(const std::string& url, std::string& outPayload) {
 
   http.end();
   return code;
-}
-
-std::optional<Weather> fetch_weather() {
-  if (!is_wifi_connected()) {
-    Serial.println("brak połączenia wifi");
-    return std::nullopt;
-  }
-  const std::string url = build_weather_url(BASE_URL, CITY, API_KEY);
-  std::string payload {};
-
-  int code = http_get(url, payload);
-  if (code <= 0) {
-    Serial.println("Błąd połączenia http");
-    return std::nullopt;
-  }
-  if (code != 200) {
-    Serial.printf("Błąd http: %d\n", code);
-    return std::nullopt;
-  }
-
-  std::optional<Weather> result = parse_weather_json(payload);
-
-  if (!result.has_value()) {
-    Serial.println("Błąd JSON");
-  }
-
-  return result;
 }
 
 void setup_network(std::shared_ptr<Weather> weather) {

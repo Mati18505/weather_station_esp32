@@ -1,6 +1,13 @@
 #pragma once
 #include <string_view>
+
+#if __has_include("secrets.h")
 #include "secrets.h"
+#else
+constexpr std::string_view WIFI_SSID = "dummy_ssid";
+constexpr std::string_view WIFI_PASS = "dummy_ssid";
+constexpr std::string_view API_KEY = "dummy_key";
+#endif
 
 constexpr int LCD_WIDTH = 16;
 constexpr int LCD_HEIGHT = 2;

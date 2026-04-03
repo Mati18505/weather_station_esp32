@@ -39,6 +39,7 @@ uint64_t millis() {
 int main() {
   lcd_print(Row::First, "first line");
   lcd_print(Row::Second, "second line");
+  // This should change displayed text to "1234nd line     ".
   lcd_print(Row::Second, "1234");
   lcd_print(Row::First, "This text is too long for LCD");
   

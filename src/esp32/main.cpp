@@ -56,9 +56,7 @@ void loop() {
         refresh_display(data, lcd_print);
       } else if (result.error.has_value()) {
           Serial.println(fetch_error_to_string(result.error.value()).c_str());
-        }
       }
-
     } else {
       Serial.println("brak połączenia wifi");
     }

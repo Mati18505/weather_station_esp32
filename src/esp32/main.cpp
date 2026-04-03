@@ -25,8 +25,7 @@ void setup() {
 
 void update_app_state(AppState& app, const Weather& new_weather) {
     if (new_weather.desc != app.weather->desc) {
-        String desc = String(new_weather.desc.c_str());
-        app.lcd_second_row = ScrollableTextData::create(desc);
+        app.lcd_second_row = ScrollableTextData::create(new_weather.desc);
     }
     *(app.weather) = new_weather;
 }
@@ -51,12 +50,12 @@ void loop() {
       .humidity = app.weather->humidity,
     };
 
-    refresh_display(data);
+    refresh_display(data, lcd_print);
   }
 
   if (now - app.lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
     app.lastScroll = now;
 
-    scroll_system(app.lcd_second_row);
+    scroll_system(app.lcd_second_row, lcd_print);
   }
 }

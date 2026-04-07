@@ -3,7 +3,6 @@
 
 #include <common/config.h>
 #include "common/lcd.h"
-#include <string_view>
 
 LiquidCrystal_I2C lcd(0x27, LCD_WIDTH, LCD_HEIGHT);
 

@@ -6,6 +6,8 @@
 #include "config.h"
 #include "weather.h"
 
+using Weather = weather::Weather;
+
 using HTTPCode = int;
 using HTTPGet = HTTPCode(std::string_view url, std::string& outPayload);
 
@@ -27,7 +29,7 @@ struct FetchResult {
 };
 
 FetchResult fetch_weather(HTTPGet& http_get) {
-  const std::string url = build_weather_url(BASE_URL, CITY, API_KEY);
+  const std::string url = weather::build_weather_url(BASE_URL, CITY, API_KEY);
   std::string payload {};
 
   int code = http_get(url, payload);
@@ -44,7 +46,7 @@ FetchResult fetch_weather(HTTPGet& http_get) {
     };
   }
 
-  std::optional<Weather> result = parse_weather_json(payload);
+  std::optional<Weather> result = weather::parse_weather_json(payload);
 
   if (!result.has_value()) {
     return FetchResult {

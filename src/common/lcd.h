@@ -31,16 +31,16 @@ struct ScrollableTextData {
 };
 
 void scroll_system(ScrollableTextData& data, LCDPrint& print) {
-  std::string text = format_scrollable(data.scrollable_text.c_str());
+  std::string text = display::format_scrollable(data.scrollable_text.c_str());
   std::string display_text = text.substr(data.pos, LCD_WIDTH);
 
   print(Row::Second, display_text);
 
-  data.pos = wrap_increment(data.pos, text.length() - LCD_WIDTH);
+  data.pos = display::wrap_increment(data.pos, text.length() - LCD_WIDTH);
 }
 
 void refresh_display(FirstLineDisplayData data, LCDPrint& print) {
-  std::string first_line = format_first_line(data.temp, data.humidity);
+  std::string first_line = display::format_first_line(data.temp, data.humidity);
 
   print(Row::First, first_line);
 }

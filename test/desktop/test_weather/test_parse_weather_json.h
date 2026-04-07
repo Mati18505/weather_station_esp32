@@ -8,7 +8,7 @@ void test_parse_weather_minimal_valid_json() {
     "weather": [ { "description": "clear sky" } ]
     })";
 
-  auto result = parse_weather_json(json);
+  auto result = weather::parse_weather_json(json);
 
   TEST_ASSERT_TRUE(result.has_value());
   TEST_ASSERT_EQUAL_FLOAT(21.5, result->temperature);
@@ -19,7 +19,7 @@ void test_parse_weather_minimal_valid_json() {
 void test_parse_weather_invalid_json() {
   std::string json = "invalid json";
 
-  auto result = parse_weather_json(json);
+  auto result = weather::parse_weather_json(json);
 
   TEST_ASSERT_FALSE(result.has_value());
 }
@@ -27,7 +27,7 @@ void test_parse_weather_invalid_json() {
 void test_parse_weather_empty_json() {
   std::string json = R"({ })";
 
-  auto result = parse_weather_json(json);
+  auto result = weather::parse_weather_json(json);
 
   TEST_ASSERT_FALSE(result.has_value());
 }
@@ -35,7 +35,7 @@ void test_parse_weather_empty_json() {
 void test_parse_weather_missing_fields() {
   std::string json = R"({ "main": {}, "weather": [{}] })";
 
-  auto result = parse_weather_json(json);
+  auto result = weather::parse_weather_json(json);
 
   TEST_ASSERT_FALSE(result.has_value());
 }
@@ -46,7 +46,7 @@ void test_parse_weather_empty_desc() {
     "weather": [ { "description": "" } ]
     })";
 
-  auto result = parse_weather_json(json);
+  auto result = weather::parse_weather_json(json);
 
   TEST_ASSERT_TRUE(result.has_value());
   TEST_ASSERT_EQUAL_FLOAT(21.5, result->temperature);
@@ -83,7 +83,7 @@ void test_parse_weather_real_valid_json() {
     }
   )";
 
-  auto result = parse_weather_json(json);
+  auto result = weather::parse_weather_json(json);
 
   TEST_ASSERT_TRUE(result.has_value());
   TEST_ASSERT_EQUAL_FLOAT(25.3, result->temperature);

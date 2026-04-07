@@ -4,7 +4,7 @@
 #include <string_view>
 
 void test_build_weather_url_basic() {
-    std::string url = build_weather_url(
+    std::string url = weather::build_weather_url(
         "http://api.test/weather?q=",
         "Gdansk",
         "XYZ123"
@@ -17,7 +17,7 @@ void test_build_weather_url_basic() {
 }
 
 void test_build_weather_url_empty_city() {
-    std::string url = build_weather_url(
+    std::string url = weather::build_weather_url(
         "http://api.test/weather?q=",
         "",
         "XYZ123"
@@ -30,7 +30,7 @@ void test_build_weather_url_empty_city() {
 }
 
 void test_build_weather_url_empty_api_key() {
-    std::string url = build_weather_url(
+    std::string url = weather::build_weather_url(
         "http://api.test/weather?q=",
         "Gdansk",
         ""
@@ -43,7 +43,7 @@ void test_build_weather_url_empty_api_key() {
 }
 
 void test_build_weather_url_long_city() {
-    std::string url = build_weather_url(
+    std::string url = weather::build_weather_url(
         "http://api.test/weather?q=",
         "VeryLongCityName1234567890",
         "XYZ123"

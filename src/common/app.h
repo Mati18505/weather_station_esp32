@@ -12,6 +12,8 @@
 #include "format.h"
 
 namespace app {
+using Weather = weather::Weather;
+
 using Log = void(std::string_view text);
 using IsConnected = bool();
 using HandleConnections = void();

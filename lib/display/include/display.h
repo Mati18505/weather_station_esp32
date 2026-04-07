@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <string>
 
+namespace display {
 // 16x' ' + text + 16x' '
 inline std::string format_scrollable(std::string_view text) {
   std::string result;
@@ -39,4 +40,5 @@ inline size_t wrap_increment(size_t x, size_t wrap_at) {
     x = 0;
 
   return x;
+}
 }

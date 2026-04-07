@@ -11,7 +11,7 @@ void test_returns_true_immediately() {
     return true;
   };
 
-  bool result = retry_until_success(condition, 5);
+  bool result = weather::retry_until_success(condition, 5);
 
   TEST_ASSERT_TRUE(result);
   TEST_ASSERT_EQUAL_UINT32(1, calls);
@@ -25,7 +25,7 @@ void test_returns_true_after_several_attempts() {
     return calls == 3;
   };
 
-  bool result = retry_until_success(condition, 5);
+  bool result = weather::retry_until_success(condition, 5);
 
   TEST_ASSERT_TRUE(result);
   TEST_ASSERT_EQUAL_UINT32(3, calls);
@@ -39,7 +39,7 @@ void test_returns_false_when_all_attempts_fail() {
     return false;
   };
 
-  bool result = retry_until_success(condition, 4);
+  bool result = weather::retry_until_success(condition, 4);
 
   TEST_ASSERT_FALSE(result);
   TEST_ASSERT_EQUAL_UINT32(4, calls);
@@ -53,7 +53,7 @@ void test_zero_attempts_means_no_calls() {
     return true;
   };
 
-  bool result = retry_until_success(condition, 0);
+  bool result = weather::retry_until_success(condition, 0);
 
   TEST_ASSERT_FALSE(result);
   TEST_ASSERT_EQUAL_UINT32(0, calls);

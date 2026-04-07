@@ -7,6 +7,7 @@
 #include <string_view>
 #include <ArduinoJson.h>
 
+namespace weather {
 struct Weather {
   float temperature;
   int humidity;
@@ -29,7 +30,7 @@ inline bool retry_until_success(std::function<bool()> condition, uint32_t max_at
 std::optional<Weather> parse_weather_json(std::string_view payload) {
   JsonDocument doc;
   if (deserializeJson(doc, payload)) {
-      return std::nullopt;
+    return std::nullopt;
   }
 
   JsonObject main = doc["main"].as<JsonObject>();
@@ -47,7 +48,7 @@ std::optional<Weather> parse_weather_json(std::string_view payload) {
   std::string desc = weather[0]["description"] | "";
 
   if (std::isnan(temperature) || humidity < 0) {
-      return std::nullopt;
+    return std::nullopt;
   }
 
   return Weather{
@@ -91,4 +92,5 @@ std::string build_weather_url(std::string_view base_url, std::string_view city, 
   url += "&units=metric";
 
   return url;
+}
 }

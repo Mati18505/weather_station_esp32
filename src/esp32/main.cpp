@@ -5,6 +5,8 @@
 #include "network.h"
 #include "common/app.h"
 
+using Weather = weather::Weather;
+
 std::optional<app::Application> application;
 
 void log_msg(std::string_view msg) {

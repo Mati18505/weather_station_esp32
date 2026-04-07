@@ -9,7 +9,7 @@ void test_scrollable(const char* text) {
   constexpr size_t trailing = 16;
 
   const size_t text_len = strlen(text);
-  const std::string result = format_scrollable(text);
+  const std::string result = display::format_scrollable(text);
   const size_t start = leading; 
   const size_t end = leading + text_len; 
 

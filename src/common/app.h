@@ -1,6 +1,5 @@
 #pragma once
 #include <cmath>
-#include <functional>
 #include <string_view>
 #include <string>
 #include <optional>
@@ -10,7 +9,6 @@
 #include "config.h"
 #include "network.h"
 #include "lcd.h"
-#include "display.h"
 #include "format.h"
 
 namespace app {
@@ -38,14 +36,14 @@ public:
   Application(Hardware hw) : hw(hw) {}
 
   void loop(uint64_t now) {
-    const bool connected = hw.is_connected();
-    hw.handle_connections();
+    const bool connected = is_connected();
+    handle_connections();
 
     if (!connected) {
       if (now >= wifi_retry_state.next_try_at) {
         wifi_retry_state.attempts++;
         wifi_retry_state.next_try_at = now + 500;
-        hw.log_msg("Łączenie z wifi...");
+        log("Łączenie z wifi...");
       }
     }
 
@@ -53,28 +51,18 @@ public:
       if (now - lastFetch >= WEATHER_FETCH_DELAY_MS) {
         lastFetch = now;
 
-        hw.log_msg("pobieranie danych");
-        FetchResult result = fetch_weather(*hw.http_get);
-
-        if (result.weather.has_value()) {
-          update_weather(result.weather.value());
-
-          FirstLineDisplayData data {
-            .temp = std::round(weather->temperature),
-            .humidity = weather->humidity,
-          };
-
-          refresh_display(data, *hw.lcd_print);
-        } else if (result.error.has_value()) {
-          hw.log_msg(fetch_error_to_string(result.error.value()));
-        }
+        log("pobieranie danych");
+        fetch_and_update_weather();
+        refresh_weather_display();
       }
     }
 
     if (now - lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
       lastScroll = now;
 
-      scroll_system(lcd_second_row, *hw.lcd_print);
+      if (hw.lcd_print) {
+        scroll_system(lcd_second_row, *hw.lcd_print);
+      }
     }
   }
 
@@ -90,6 +78,45 @@ private:
       lcd_second_row = ScrollableTextData::create(new_weather.desc);
     }
     *weather = new_weather;
+  }
+
+  void fetch_and_update_weather() {
+    if (hw.http_get) {
+      FetchResult result = fetch_weather(*hw.http_get);
+
+      if (result.weather.has_value()) {
+        update_weather(result.weather.value());
+      } else if (result.error.has_value()) {
+        log(fetch_error_to_string(result.error.value()));
+      }
+    }
+  }
+
+  void log(std::string_view message) {
+    if (hw.log_msg) {
+      hw.log_msg(message);
+    }
+  }
+
+  void refresh_weather_display() {
+    if (hw.lcd_print) {
+      FirstLineDisplayData data {
+        .temp = std::round(weather->temperature),
+        .humidity = weather->humidity,
+      };
+
+      refresh_display(data, *hw.lcd_print);
+    }
+  }
+
+  void handle_connections() {
+    if (hw.handle_connections) {
+      hw.handle_connections();
+    }
+  }
+
+  bool is_connected() {
+    return hw.is_connected ? hw.is_connected() : true;
   }
 };
 }

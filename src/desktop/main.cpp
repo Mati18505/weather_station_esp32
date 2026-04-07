@@ -13,12 +13,6 @@ void log_msg(std::string_view text) {
   std::cout << text << std::endl;
 }
 
-bool is_connected() {
-  return true;
-}
-
-void handle_connections() {}
-
 void lcd_print(Row row, std::string_view text) {
   static std::string lcd[LCD_HEIGHT] = {
     std::string(LCD_WIDTH, ' '),
@@ -62,8 +56,8 @@ int http_get(std::string_view url, std::string& outPayload) {
 app::Hardware make_desktop_hardware() {
     return {
         .log_msg = log_msg,
-        .is_connected = is_connected,
-        .handle_connections = handle_connections,
+        .is_connected = nullptr,
+        .handle_connections = nullptr,
         .http_get = http_get,
         .lcd_print = lcd_print,
     };

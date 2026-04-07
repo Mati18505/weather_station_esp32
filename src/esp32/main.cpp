@@ -1,16 +1,34 @@
-#include <cmath>
+#include <string_view>
 
 #include <common/config.h>
 #include "lcd.h"
 #include "network.h"
+#include "common/app.h"
 
-struct AppState {
-  std::shared_ptr<Weather> weather = std::make_shared<Weather>();
-  ScrollableTextData lcd_second_row;
-  long lastFetch = 0;
-  long lastScroll = 0;
-};
-static AppState app;
+std::optional<app::Application> application;
+
+void log_msg(std::string_view msg) {
+  Serial.write(msg.data(), msg.size());
+  Serial.flush();
+}
+
+bool is_connected() {
+  return WiFi.status() == WL_CONNECTED;
+}
+
+void handle_connections() {
+  server.handleClient();
+}
+
+app::Hardware make_esp_hardware() {
+    return {
+        .log_msg = log_msg,
+        .is_connected = is_connected,
+        .handle_connections = handle_connections,
+        .http_get = http_get,
+        .lcd_print = lcd_print,
+    };
+}
 
 void setup() {
   Serial.begin(9600);
@@ -19,44 +37,16 @@ void setup() {
     Serial.println("Nie udało się zamontować systemu plików LittleFS");
   }
 
-  setup_network(app.weather);
-  setup_lcd();
-}
+  WiFi.begin(WIFI_SSID.data(), WIFI_PASS.data());
 
-void update_app_state(AppState& app, const Weather& new_weather) {
-    if (new_weather.desc != app.weather->desc) {
-        String desc = String(new_weather.desc.c_str());
-        app.lcd_second_row = ScrollableTextData::create(desc);
-    }
-    *(app.weather) = new_weather;
+  setup_lcd();
+
+  application = app::Application { make_esp_hardware() };
+  setup_network(application.value().weather);
 }
 
 void loop() {
-  server.handleClient();
-
   unsigned long now = millis();
 
-  if (now - app.lastFetch >= WEATHER_FETCH_DELAY_MS) {
-    app.lastFetch = now;
-
-    Serial.println("pobieranie danych");
-
-    std::optional<Weather> maybe_weather = fetch_weather();
-    if (maybe_weather.has_value()) {
-      update_app_state(app, maybe_weather.value());
-    }
-
-    FirstLineDisplayData data {
-      .temp = std::round(app.weather->temperature),
-      .humidity = app.weather->humidity,
-    };
-
-    refresh_display(data);
-  }
-
-  if (now - app.lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
-    app.lastScroll = now;
-
-    scroll_system(app.lcd_second_row);
-  }
+  application.value().loop(now);
 }

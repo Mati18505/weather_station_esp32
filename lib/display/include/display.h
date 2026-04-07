@@ -2,14 +2,14 @@
 #include <algorithm>
 #include <string>
 
-// 10x' ' + text + 9x' '
+// 16x' ' + text + 16x' '
 inline std::string format_scrollable(std::string_view text) {
   std::string result;
-  result.reserve(10 + text.length() + 9);
+  result.reserve(16 + text.length() + 16);
 
-  for (int i = 0; i < 10; i++) result += ' ';
+  for (int i = 0; i < 16; i++) result += ' ';
   result += text;
-  for (int i = 0; i < 9; i++) result += ' ';
+  for (int i = 0; i < 16; i++) result += ' ';
 
   return result;
 }

@@ -10,30 +10,6 @@
 
 static WebServer server(80);
 
-bool try_connect_wifi();
-void weatherHandler(Weather& weather);
-
-bool is_wifi_connected() {
-  return WiFi.status() == WL_CONNECTED;
-}
-
-bool try_connect_wifi() {
-  WiFi.begin(WIFI_SSID.data(), WIFI_PASS.data());
-
-  retry_until_success([](){
-    if (is_wifi_connected()) {
-      return true;
-    }
-
-    delay(500);
-    Serial.print(".");
-
-    return false;
-  }, MAX_WIFI_CONNECT_ATTEMPTS);
-
-  return is_wifi_connected();
-}
-
 int http_get(std::string_view url, std::string& outPayload) {
   const std::string url_nt(url);
 
@@ -50,15 +26,6 @@ int http_get(std::string_view url, std::string& outPayload) {
 }
 
 void setup_network(std::shared_ptr<Weather> weather) {
-  Serial.println("Łączenie z wifi.");
-
-  if (try_connect_wifi()) {
-    Serial.println("\nPołączono z wifi!");
-  } else {
-    Serial.printf("\nNie udało się połączyć z wifi po %d próbach!\n", MAX_WIFI_CONNECT_ATTEMPTS);
-    ESP.restart();
-  }
-
   server.on("/weather", HTTP_GET, [weather]() {
     std::string response = serialize_weather(*weather);
 

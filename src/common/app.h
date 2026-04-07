@@ -14,16 +14,16 @@
 #include "format.h"
 
 namespace app {
-using Log = std::function<void(std::string_view text)>;
-using IsConnected = std::function<bool()>;
-using HandleConnections = std::function<void()>;
+using Log = void(std::string_view text);
+using IsConnected = bool();
+using HandleConnections = void();
 
 struct Hardware {
-  Log log_msg;
-  IsConnected is_connected;
-  HandleConnections handle_connections;
-  HTTPGet http_get;
-  LCDPrint lcd_print;
+  Log* log_msg;
+  IsConnected* is_connected;
+  HandleConnections* handle_connections;
+  HTTPGet* http_get;
+  LCDPrint* lcd_print;
 };
 
 struct WifiRetryState {
@@ -54,7 +54,7 @@ public:
         lastFetch = now;
 
         hw.log_msg("pobieranie danych");
-        FetchResult result = fetch_weather(hw.http_get);
+        FetchResult result = fetch_weather(*hw.http_get);
 
         if (result.weather.has_value()) {
           update_weather(result.weather.value());
@@ -64,7 +64,7 @@ public:
             .humidity = weather->humidity,
           };
 
-          refresh_display(data, hw.lcd_print);
+          refresh_display(data, *hw.lcd_print);
         } else if (result.error.has_value()) {
           hw.log_msg(fetch_error_to_string(result.error.value()));
         }
@@ -74,7 +74,7 @@ public:
     if (now - lastScroll >= SCROLL_DELAY_PER_CHAR_MS) {
       lastScroll = now;
 
-      scroll_system(lcd_second_row, hw.lcd_print);
+      scroll_system(lcd_second_row, *hw.lcd_print);
     }
   }
 

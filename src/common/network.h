@@ -1,15 +1,13 @@
 #pragma once
-#include <functional>
 #include <string_view>
 #include <string>
 #include <optional>
-#include <variant>
 
 #include "config.h"
 #include "weather.h"
 
 using HTTPCode = int;
-using HTTPGet = std::function<HTTPCode(std::string_view url, std::string& outPayload)>;
+using HTTPGet = HTTPCode(std::string_view url, std::string& outPayload);
 
 enum class FetchErrorKind {
   HTTPCannotConnect,
@@ -28,7 +26,7 @@ struct FetchResult {
   std::optional<FetchError> error;
 };
 
-FetchResult fetch_weather(HTTPGet http_get) {
+FetchResult fetch_weather(HTTPGet& http_get) {
   const std::string url = build_weather_url(BASE_URL, CITY, API_KEY);
   std::string payload {};
 

@@ -3,6 +3,7 @@
 #include <common/config.h>
 #include "lcd.h"
 #include "network.h"
+#include "web_server.h"
 #include "common/app.h"
 
 using Weather = weather::Weather;
@@ -29,6 +30,7 @@ app::Hardware make_esp_hardware() {
         .handle_connections = handle_connections,
         .http_get = http_get,
         .lcd_print = lcd_print,
+        .setup_web_srv = setup_web_server,
     };
 }
 
@@ -44,7 +46,6 @@ void setup() {
   setup_lcd();
 
   application = app::Application { make_esp_hardware() };
-  setup_network(application.value().weather);
 }
 
 void loop() {

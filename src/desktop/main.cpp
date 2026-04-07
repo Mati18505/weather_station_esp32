@@ -53,6 +53,12 @@ int http_get(std::string_view url, std::string& outPayload) {
   return 200;
 }
 
+static WeatherHandler weather_handler {};
+
+void setup_web_server(WeatherHandler wh) {
+  weather_handler = wh;
+}
+
 app::Hardware make_desktop_hardware() {
     return {
         .log_msg = log_msg,
@@ -60,6 +66,7 @@ app::Hardware make_desktop_hardware() {
         .handle_connections = nullptr,
         .http_get = http_get,
         .lcd_print = lcd_print,
+        .setup_web_srv = setup_web_server,
     };
 }
 
@@ -73,9 +80,17 @@ int main() {
   app::Application application { make_desktop_hardware() };
   
   bool should_exit = false;
+  uint64_t lastLogServed = 0;
 
   while (!should_exit) {
     uint64_t now = millis();
+
+    if (now - lastLogServed >= 3000) {
+      lastLogServed = now;
+
+      std::string curr_served = weather_handler();
+      log_msg(curr_served);
+    }
 
     application.loop(now);
     std::this_thread::sleep_for(std::chrono::milliseconds(1));

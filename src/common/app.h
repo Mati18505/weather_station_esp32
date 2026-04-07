@@ -10,6 +10,7 @@
 #include "network.h"
 #include "lcd.h"
 #include "format.h"
+#include "weather_server.h"
 
 namespace app {
 using Weather = weather::Weather;
@@ -24,6 +25,7 @@ struct Hardware {
   HandleConnections* handle_connections;
   HTTPGet* http_get;
   LCDPrint* lcd_print;
+  SetupWebServer* setup_web_srv;
 };
 
 struct WifiRetryState {
@@ -34,8 +36,13 @@ struct WifiRetryState {
 class Application {
 public:
   std::shared_ptr<Weather> weather = std::make_shared<Weather>();
+  WeatherServer weather_srv;
 
-  Application(Hardware hw) : hw(hw) {}
+  Application(Hardware hw)
+    : hw(hw),
+      weather_srv(WeatherServer::Impl{
+          .setup = hw.setup_web_srv,
+      }) {}
 
   void loop(uint64_t now) {
     const bool connected = is_connected();
@@ -80,6 +87,7 @@ private:
       lcd_second_row = ScrollableTextData::create(new_weather.desc);
     }
     *weather = new_weather;
+    weather_srv.weather = new_weather;
   }
 
   void fetch_and_update_weather() {

@@ -4,7 +4,6 @@
 #include <string>
 #include <optional>
 #include <cstdint>
-#include <memory>
 
 #include "config.h"
 #include "network.h"
@@ -35,7 +34,7 @@ struct WifiRetryState {
 
 class Application {
 public:
-  std::shared_ptr<Weather> weather = std::make_shared<Weather>();
+  Weather weather {};
   WeatherServer weather_srv;
 
   Application(Hardware hw)
@@ -83,10 +82,10 @@ private:
   Hardware hw;
 
   void update_weather(const Weather& new_weather) {
-    if (new_weather.desc != weather->desc) {
+    if (new_weather.desc != weather.desc) {
       lcd_second_row = ScrollableTextData::create(new_weather.desc);
     }
-    *weather = new_weather;
+    weather = new_weather;
     weather_srv.weather = new_weather;
   }
 
@@ -111,8 +110,8 @@ private:
   void refresh_weather_display() {
     if (hw.lcd_print) {
       FirstLineDisplayData data {
-        .temp = std::round(weather->temperature),
-        .humidity = weather->humidity,
+        .temp = std::round(weather.temperature),
+        .humidity = weather.humidity,
       };
 
       refresh_display(data, *hw.lcd_print);

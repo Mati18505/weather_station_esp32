@@ -7,7 +7,7 @@ bool str_has_substr(std::string_view str, std::string_view substr) {
 }
 
 void test_serialize_weather_basic() {
-  Weather w{21.5f, 60, "clear sky"};
+  weather::Weather w{21.5f, 60, "clear sky"};
 
   std::string json = weather::serialize_weather(w);
 
@@ -19,7 +19,7 @@ void test_serialize_weather_basic() {
 }
 
 void test_serialize_weather_empty_desc() {
-    Weather w{10.0f, 50, ""};
+    weather::Weather w{10.0f, 50, ""};
 
     std::string json = weather::serialize_weather(w);
 
@@ -28,7 +28,7 @@ void test_serialize_weather_empty_desc() {
 }
 
 void test_serialize_weather_negative_values() {
-    Weather w{-5.0f, -1, "cold"};
+    weather::Weather w{-5.0f, -1, "cold"};
 
     std::string json = weather::serialize_weather(w);
 

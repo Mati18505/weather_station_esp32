@@ -2,7 +2,7 @@
 Weather station that fetches data from the OpenWeather API
 Then displays it on an LCD screen and serves it via an HTTP server.
 
-## 🎬 Demo
+## 🎬 Simulation
 ![Desktop simulation](docs/demo.gif)
 
 ## 🚀 Quick Start

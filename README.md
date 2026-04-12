@@ -24,7 +24,7 @@ constexpr std::string_view API_KEY = "YOUR_OPEN_WEATHER_API_KEY";
 pio run -e esp32c3 -t upload
 ```
 
-### Send files from `data` to esp FS
+### Send files from `data` to esp fs
 ```bash
 pio run -e esp32c3 -t uploadfs
 ```

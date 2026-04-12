@@ -43,10 +43,9 @@ pio run -e desktop -t exec
 ```
 
 ## Project structure
-`data`: static web frontend (HTML/CSS/JS served from ESP filesystem)
-`lib`: pure functions, that are unit tested
-`test`: unit testing with [unity testing framework](https://www.throwtheswitch.org/unity)
-`src`:
-- `common`: platform-independent code shared by desktop and esp
-- `desktop`: platform-specific native code
-- `esp32`: platform-specific esp code
+- `data`: static web frontend (HTML/CSS/JS served from ESP filesystem)
+- `lib`: pure functions, that are unit tested
+- `test`: unit testing with [unity testing framework](https://www.throwtheswitch.org/unity)
+- `src/common`: platform-independent code shared by desktop and esp
+- `src/desktop`: platform-specific native code
+- `src/esp32`: platform-specific esp code

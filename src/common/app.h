@@ -110,7 +110,7 @@ private:
   void refresh_weather_display() {
     if (hw.lcd_print) {
       FirstLineDisplayData data {
-        .temp = std::round(weather.temperature),
+        .temp = static_cast<int>(std::round(weather.temperature)),
         .humidity = weather.humidity,
       };
 

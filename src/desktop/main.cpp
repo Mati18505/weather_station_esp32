@@ -48,7 +48,7 @@ int http_get(std::string_view url, std::string& outPayload) {
 
   outPayload = R"({
     "main": { "temp": 21.5, "humidity": 60 },
-    "weather": [ { "description": "clear sky" } ]
+    "weather": [ { "id": 800, "description": "clear sky" } ]
     })";
   return 200;
 }

@@ -5,7 +5,7 @@
 void test_parse_weather_minimal_valid_json() {
   std::string json = R"({
     "main": { "temp": 21.5, "humidity": 60 },
-    "weather": [ { "description": "clear sky" } ]
+    "weather": [ { "id": 800 } ]
     })";
 
   auto result = weather::parse_weather_json(json);
@@ -13,7 +13,7 @@ void test_parse_weather_minimal_valid_json() {
   TEST_ASSERT_TRUE(result.has_value());
   TEST_ASSERT_EQUAL_FLOAT(21.5, result->temperature);
   TEST_ASSERT_EQUAL_INT(60, result->humidity);
-  TEST_ASSERT_EQUAL_STRING("clear sky", result->desc.c_str());
+  TEST_ASSERT_EQUAL_INT(800, static_cast<int>(result->weather_code));
 }
 
 void test_parse_weather_invalid_json() {
@@ -43,7 +43,7 @@ void test_parse_weather_missing_fields() {
 void test_parse_weather_empty_desc() {
   std::string json = R"({
     "main": { "temp": 21.5, "humidity": 60 },
-    "weather": [ { "description": "" } ]
+    "weather": [ { "id": "" } ]
     })";
 
   auto result = weather::parse_weather_json(json);
@@ -51,7 +51,7 @@ void test_parse_weather_empty_desc() {
   TEST_ASSERT_TRUE(result.has_value());
   TEST_ASSERT_EQUAL_FLOAT(21.5, result->temperature);
   TEST_ASSERT_EQUAL_INT(60, result->humidity);
-  TEST_ASSERT_EQUAL_STRING("", result->desc.c_str());
+  TEST_ASSERT_EQUAL_INT(0, result->weather_code);
 }
 
 void test_parse_weather_real_valid_json() {
@@ -88,7 +88,7 @@ void test_parse_weather_real_valid_json() {
   TEST_ASSERT_TRUE(result.has_value());
   TEST_ASSERT_EQUAL_FLOAT(25.3, result->temperature);
   TEST_ASSERT_EQUAL_INT(65, result->humidity);
-  TEST_ASSERT_EQUAL_STRING("clear sky", result->desc.c_str());
+  TEST_ASSERT_EQUAL_INT(800, static_cast<int>(result->weather_code));
 }
 
 void test_parse_weather_json() {

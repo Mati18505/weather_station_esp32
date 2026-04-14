@@ -10,6 +10,7 @@
 #include "lcd.h"
 #include "format.h"
 #include "weather_server.h"
+#include "weather_desc.h"
 
 namespace app {
 using Weather = weather::Weather;
@@ -82,8 +83,11 @@ private:
   Hardware hw;
 
   void update_weather(const Weather& new_weather) {
-    if (new_weather.desc != weather.desc) {
-      lcd_second_row = ScrollableTextData::create(new_weather.desc);
+    if (new_weather.weather_code != weather.weather_code) {
+      weather::WeatherCode weather_code = new_weather.weather_code;
+      std::string_view desc = weather::to_string(weather_code);
+
+      lcd_second_row = ScrollableTextData::create(std::string(desc));
     }
     weather = new_weather;
     weather_srv.weather = new_weather;

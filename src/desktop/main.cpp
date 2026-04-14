@@ -59,10 +59,14 @@ void setup_web_server(WeatherHandler wh) {
   weather_handler = wh;
 }
 
+bool is_connected() {
+  return true;
+}
+
 app::Hardware make_desktop_hardware() {
     return {
         .log_msg = log_msg,
-        .is_connected = nullptr,
+        .is_connected = is_connected,
         .handle_connections = nullptr,
         .http_get = http_get,
         .lcd_print = lcd_print,

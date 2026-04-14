@@ -52,7 +52,9 @@ public:
       if (now >= wifi_retry_state.next_try_at) {
         wifi_retry_state.attempts++;
         wifi_retry_state.next_try_at = now + 500;
+
         log("Łączenie z wifi...");
+        display_status("Laczenie z wifi...");
       }
     }
 
@@ -119,6 +121,12 @@ private:
       };
 
       refresh_display(data, *hw.lcd_print);
+    }
+  }
+
+  void display_status(std::string_view status) {
+    if (hw.lcd_print) {
+      hw.lcd_print(Row::First, status);
     }
   }
 

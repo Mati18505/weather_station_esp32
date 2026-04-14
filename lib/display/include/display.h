@@ -16,14 +16,13 @@ inline std::string format_scrollable(std::string_view text) {
 }
 
 inline std::string format_first_line(int temp, unsigned int humidity) {
-  // Numbers can take max 4 characters, before buffer overflows.
-  temp = std::clamp(temp, -999, 9999);
-  humidity = std::clamp(humidity, 0u, 9999u);
+  temp = std::clamp(temp, -99, 99);
+  humidity = std::clamp(humidity, 0u, 100u);
 
   char buffer[17];
 
   int n = snprintf(buffer, sizeof(buffer),
-                   "*C: %d  %%:%d", temp, humidity);
+                   "T: %d*  H: %d%%", temp, humidity);
 
   int text_end = std::clamp(n, 0, 16);
 

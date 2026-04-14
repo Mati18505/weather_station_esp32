@@ -7,11 +7,13 @@
 #include <string_view>
 #include <ArduinoJson.h>
 
+#include "weather_desc.h"
+
 namespace weather {
 struct Weather {
   float temperature;
   int humidity;
-  std::string desc;
+  WeatherCode weather_code;
 };
 
 inline bool retry_until_success(std::function<bool()> condition, uint32_t max_attempts) {
@@ -45,7 +47,9 @@ std::optional<Weather> parse_weather_json(std::string_view payload) {
 
   float temperature = main["temp"] | NAN;
   int humidity = main["humidity"] | -1;
-  std::string desc = weather[0]["description"] | "";
+  int desc_id = weather[0]["id"] | 0;
+
+  WeatherCode weather_code = static_cast<WeatherCode>(desc_id);
 
   if (std::isnan(temperature) || humidity < 0) {
     return std::nullopt;
@@ -54,7 +58,7 @@ std::optional<Weather> parse_weather_json(std::string_view payload) {
   return Weather{
     .temperature = temperature,
     .humidity = humidity,
-    .desc = desc,
+    .weather_code = weather_code,
   };
 }
 
@@ -65,7 +69,7 @@ std::string serialize_weather(const Weather& weather) {
 
   doc["temperature"] = weather.temperature;
   doc["humidity"] = weather.humidity;
-  doc["desc"] = weather.desc;
+  doc["weather_code"] = static_cast<int>(weather.weather_code);
 
   if (doc.overflowed()) {
     return {};

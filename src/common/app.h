@@ -58,6 +58,17 @@ public:
       }
     }
 
+    if (!was_connected && connected) {
+      // connected event
+      log("pobieranie danych");
+      fetch_and_update_weather();
+      refresh_weather_display();
+
+      if (hw.lcd_print) {
+        scroll_system(lcd_second_row, *hw.lcd_print);
+      }
+    }
+
     if (connected) {
       if (now - lastFetch >= WEATHER_FETCH_DELAY_MS) {
         lastFetch = now;
@@ -75,6 +86,8 @@ public:
         scroll_system(lcd_second_row, *hw.lcd_print);
       }
     }
+
+    was_connected = connected;
   }
 
 private:
@@ -83,6 +96,7 @@ private:
   uint64_t lastScroll = 0;
   WifiRetryState wifi_retry_state {};
   Hardware hw;
+  bool was_connected = false;
 
   void update_weather(const Weather& new_weather) {
     if (new_weather.weather_code != weather.weather_code) {

@@ -31,7 +31,8 @@
             
         </div>
     </div>
-    <script>
+    <script type="module">
+        import { weather_code_to_string } from "./lib.js";
         async function fetchData() {
             try {
                 const response = await fetch('/weather');
@@ -39,7 +40,7 @@
                 
                 document.getElementById('temperature').innerText = json.temperature;
                 document.getElementById('humidity').innerText = json.humidity;
-                document.getElementById('desc').innerText = json.desc;
+                document.getElementById('desc').innerText = weather_code_to_string(json.weather_code);
             } catch (err) {
                 console.error("Błąd pobierania danych:", err);
             }

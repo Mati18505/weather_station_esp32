@@ -6,7 +6,7 @@
 
 void test_first_line(int temp, unsigned int humidity) {
   const std::string result = display::format_first_line(temp, humidity);
-  const std::string expected_start = "*C: " + std::to_string(temp) + "  %:" + std::to_string(humidity);
+  const std::string expected_start = "T: " + std::to_string(temp) + "*  H: " + std::to_string(humidity) + "%";
 
   TEST_ASSERT_EQUAL_UINT32(16, result.length());
 
@@ -35,7 +35,7 @@ void test_max_values_clamp() {
   unsigned int humidity = std::numeric_limits<unsigned int>::max();
 
   const std::string result = display::format_first_line(temp, humidity);
-  const std::string expected = "*C: 9999  %:9999";
+  const std::string expected = "T: 99*  H: 100% ";
 
   TEST_ASSERT_EQUAL_UINT32(16, result.length());
   TEST_ASSERT_EQUAL_STRING(expected.c_str(), result.c_str());
@@ -46,7 +46,7 @@ void test_min_values_clamp() {
   unsigned int humidity = 0u;
 
   const std::string result = display::format_first_line(temp, humidity);
-  const std::string expected = "*C: -999  %:0   ";
+  const std::string expected = "T: -99*  H: 0%  ";
 
   TEST_ASSERT_EQUAL_UINT32(16, result.length());
   TEST_ASSERT_EQUAL_STRING(expected.c_str(), result.c_str());

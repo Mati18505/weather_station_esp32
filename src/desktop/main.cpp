@@ -60,7 +60,19 @@ void setup_web_server(WeatherHandler wh) {
 }
 
 bool is_connected() {
-  return true;
+  static bool state = true;
+  static uint64_t last_toggle = 0;
+  uint64_t now = millis();
+
+  const int interval = 5000;
+
+  if (now - last_toggle >= interval) {
+      last_toggle = now;
+
+      state = !state;
+  }
+
+  return state;
 }
 
 app::Hardware make_desktop_hardware() {
